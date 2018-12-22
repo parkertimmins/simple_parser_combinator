@@ -8,7 +8,7 @@
  * Returns null on failure
  */
 let terminal = (pattern, node=x => x) => tokens => 
-	tokens.length && tokens[0].match(pattern) ? node(tokens.shift()) : null
+    tokens.length && tokens[0].match(pattern) ? node(tokens.shift()) : null
 
 /* Builds a parser that requires each of `parsers` in sequence. If
  * successfully matchs all parsers constructs a `node` from the matched
@@ -17,13 +17,13 @@ let terminal = (pattern, node=x => x) => tokens =>
  * Returns null on failure 
  */
 let sequencing = (parsers, node=x => x) => tokens => {
-	let results = [] 
-	for (let parser of parsers) {
-		let result = consumeIfNotNull(parser, tokens)
-		if (!result) return null
-		results.push(result)
-	}    
-	return node(results)
+    let results = [] 
+    for (let parser of parsers) {
+        let result = consumeIfNotNull(parser, tokens)
+        if (!result) return null
+        results.push(result)
+    }    
+    return node(results)
 }
 
 /* Builds a parser that matches one of the `parsers`. If successfully 
@@ -31,11 +31,11 @@ let sequencing = (parsers, node=x => x) => tokens => {
  * consumes as many tokens as the matched parser. Returns null on failure
  */
 let alternation = parsers => tokens => {
-	for (let parser of parsers) {
-		let result = consumeIfNotNull(parser, tokens)
-		if (result) return result
-	}    
-	return null
+    for (let parser of parsers) {
+        let result = consumeIfNotNull(parser, tokens)
+        if (result) return result
+    }    
+    return null
 }
 
 /* Takes `alwaysConsumeParser` a parser that will consume `tokens`
@@ -44,13 +44,13 @@ let alternation = parsers => tokens => {
  * partially consumed copy. If fails, leave `tokens` unchanged.
  */
 let consumeIfNotNull = (alwaysConsumeParser, tokens) => {
-	let copy = [...tokens]
-	let result = alwaysConsumeParser()(copy)
-	if (result) tokens.splice(0, tokens.length - copy.length)
-	return result
+    let copy = [...tokens]
+    let result = alwaysConsumeParser()(copy)
+    if (result) tokens.splice(0, tokens.length - copy.length)
+    return result
 }
 
 module.exports = {
-	terminal, alternation, sequencing
+    terminal, alternation, sequencing
 }
 
