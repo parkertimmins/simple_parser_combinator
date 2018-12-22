@@ -2,6 +2,10 @@
  * and does a great deal unnecessary copying. 
  */
 
+/* Parser that matches absense of any tokens
+ */
+let empty = tokens => tokens.length === 0 ? 'EMPTY' : null
+
 /* Parser that matches a single token. Succeeds if token matches the 
  * regex `pattern`. If succeeds consumes one token. If succeed returns 
  * `node` constructed from token or returns token is `node` is undefined. 
@@ -22,6 +26,7 @@ let sequencing = (parsers, node=x => x) => tokens => {
         let result = consumeIfNotNull(parser, tokens)
         if (!result) return null
         results.push(result)
+        if (result === 'EMPTY') break // special case for empty parser
     }    
     return node(results)
 }
@@ -51,6 +56,6 @@ let consumeIfNotNull = (alwaysConsumeParser, tokens) => {
 }
 
 module.exports = {
-    terminal, alternation, sequencing
+    empty, terminal, alternation, sequencing
 }
 
