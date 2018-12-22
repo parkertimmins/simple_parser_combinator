@@ -53,3 +53,4 @@ let consumeIfNotNull = (alwaysConsumeParser, tokens) => {
 module.exports = {
 	terminal, alternation, sequencing
 }
+
