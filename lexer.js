@@ -4,7 +4,7 @@
  * single tokens. Whitespace is removed.
  */
 let lexer = (program) => {
-	var tokens = [];
+    var tokens = [];
     var res;
     var regex = /^\d+|\w+|[^\d\w\s]|\s+/g;
     while((res = regex.exec(program)) !== null) {
@@ -12,7 +12,7 @@ let lexer = (program) => {
             tokens.push(res[0])
         }
     }   
-	return tokens
+    return tokens
 }
 
 module.exports = { lexer }
