@@ -4,15 +4,16 @@
 
 /* Parser that matches absense of any tokens
  */
-let empty = tokens => tokens.length === 0 ? 'EMPTY' : null
+let EMPTY = tokens => [tokens.length === 0 ? '_EMPTY_' : null, tokens]
 
 /* Parser that matches a single token. Succeeds if token matches the 
  * regex `pattern`. If succeeds consumes one token. If succeed returns 
  * `node` constructed from token or returns token is `node` is undefined. 
  * Returns null on failure
  */
-let terminal = (pattern, node=x => x) => tokens => 
-    tokens.length && tokens[0].match(pattern) ? node(tokens.shift()) : null
+let terminal = (pattern, node_constructor=x=>x) => tokens => 
+    tokens.length && tokens[0].match(pattern) ? 
+        [node_constructor(tokens[0]), tokens.slice(1)] : [null, tokens]
 
 /* Builds a parser that requires each of `parsers` in sequence. If
  * successfully matchs all parsers constructs a `node` from the matched
@@ -20,15 +21,16 @@ let terminal = (pattern, node=x => x) => tokens =>
  * succeeds consumes as many tokens and the matched parsers.
  * Returns null on failure 
  */
-let sequencing = (parsers, node=x => x) => tokens => {
+let sequencing = (parsers, node_constructor=x=>x) => tokens => {
     let results = [] 
+    let parse_result, remaining_tokens = tokens
     for (let parser of parsers) {
-        let result = consumeIfNotNull(parser, tokens)
-        if (!result) return null
-        results.push(result)
-        if (result === 'EMPTY') break // special case for empty parser
+        [parse_result, remaining_tokens] = parser()(remaining_tokens)
+        if (!parse_result) return [null, tokens]
+        results.push(parse_result)
+        if (parse_result === '_EMPTY_') break // special case for empty parser
     }    
-    return node(results)
+    return [node_constructor(results), remaining_tokens]
 }
 
 /* Builds a parser that matches one of the `parsers`. If successfully 
@@ -37,25 +39,12 @@ let sequencing = (parsers, node=x => x) => tokens => {
  */
 let alternation = parsers => tokens => {
     for (let parser of parsers) {
-        let result = consumeIfNotNull(parser, tokens)
-        if (result) return result
+        let [parse_result, remaining_tokens] = parser()(tokens)
+        if (parse_result) return [parse_result, remaining_tokens]
     }    
-    return null
-}
-
-/* Takes `alwaysConsumeParser` a parser that will consume `tokens`
- * whether or not it matches. Calls the consuming parser with
- * a copy of `tokens`. If the parser succeeds, replaced `tokens` with the
- * partially consumed copy. If fails, leave `tokens` unchanged.
- */
-let consumeIfNotNull = (alwaysConsumeParser, tokens) => {
-    let copy = [...tokens]
-    let result = alwaysConsumeParser()(copy)
-    if (result) tokens.splice(0, tokens.length - copy.length)
-    return result
+    return [null, tokens]
 }
 
 module.exports = {
-    empty, terminal, alternation, sequencing
+    EMPTY, terminal, alternation, sequencing
 }
-
