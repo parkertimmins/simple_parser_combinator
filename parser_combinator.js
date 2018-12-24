@@ -4,22 +4,21 @@
 
 /* Parser that matches absense of any tokens
  */
-let EMPTY = tokens => [tokens.length === 0 ? '_EMPTY_' : null, tokens]
+let EMPTY = tokens => [(tokens.length === 0 ? '_EMPTY_' : null), tokens]
 
 /* Parser that matches a single token. Succeeds if token matches the 
- * regex `pattern`. If succeeds consumes one token. If succeed returns 
- * `node` constructed from token or returns token is `node` is undefined. 
- * Returns null on failure
+ * regex `pattern`. Returns a list containing the parsed node or null if fails, 
+ * along with the remaining tokens. 
  */
 let terminal = (pattern, node_constructor=x=>x) => tokens => 
     tokens.length && tokens[0].match(pattern) ? 
         [node_constructor(tokens[0]), tokens.slice(1)] : [null, tokens]
 
 /* Builds a parser that requires each of `parsers` in sequence. If
- * successfully matchs all parsers constructs a `node` from the matched
- * tokens. Or just returns the matched tokens if no `node` is defined. If 
- * succeeds consumes as many tokens and the matched parsers.
- * Returns null on failure 
+ * successfully matchs all parsers constructs a node from the matched
+ * tokens or returns the matched tokens if no `node_constructor` is defined. 
+ * Returns a list containing the parsed node or null if fails, along with the
+ * remaining tokens. 
  */
 let sequencing = (parsers, node_constructor=x=>x) => tokens => {
     let results = [] 
@@ -33,9 +32,9 @@ let sequencing = (parsers, node_constructor=x=>x) => tokens => {
     return [node_constructor(results), remaining_tokens]
 }
 
-/* Builds a parser that matches one of the `parsers`. If successfully 
- * matches a parser returns the result of the parser. If succeeds
- * consumes as many tokens as the matched parser. Returns null on failure
+/* Builds a parser that matches one of the `parsers`. Return a list
+ * containing the result of the matched parser if succeeds or null on
+ * failure, along with the remaining unparsed tokens
  */
 let alternation = parsers => tokens => {
     for (let parser of parsers) {
@@ -45,6 +44,5 @@ let alternation = parsers => tokens => {
     return [null, tokens]
 }
 
-module.exports = {
-    EMPTY, terminal, alternation, sequencing
-}
+module.exports = { EMPTY, terminal, alternation, sequencing }
+
