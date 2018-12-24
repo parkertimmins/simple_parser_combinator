@@ -1,5 +1,5 @@
 
-const { terminal, alternation, sequencing } = require('./parser_combinator.js')
+const { terminal, choice, sequence } = require('./parser_combinator.js')
 const { lexer } = require('./lexer.js')
 
 
@@ -20,9 +20,9 @@ const rparen    =()=> terminal(/\)/)
 const slash     =()=> terminal(/\\/)
 const period    =()=> terminal(/\./)
 const variable  =()=> terminal(/[a-z]+/, Var)
-const app       =()=> sequencing([lparen, expr, expr, rparen], App)
-const abs       =()=> sequencing([lparen, slash, variable, period, expr, rparen], Abs)
-const expr      =()=> alternation([variable, app, abs])
+const app       =()=> sequence([lparen, expr, expr, rparen], App)
+const abs       =()=> sequence([lparen, slash, variable, period, expr, rparen], Abs)
+const expr      =()=> choice([variable, app, abs])
 
 
 // example parse

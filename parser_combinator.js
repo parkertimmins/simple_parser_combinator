@@ -20,7 +20,7 @@ let terminal = (pattern, node_constructor=x=>x) => tokens =>
  * Returns a list containing the parsed node or null if fails, along with the
  * remaining tokens. 
  */
-let sequencing = (parsers, node_constructor=x=>x) => tokens => {
+let sequence = (parsers, node_constructor=x=>x) => tokens => {
     let results = [] 
     let parse_result, remaining_tokens = tokens
     for (let parser of parsers) {
@@ -36,7 +36,7 @@ let sequencing = (parsers, node_constructor=x=>x) => tokens => {
  * containing the result of the matched parser if succeeds or null on
  * failure, along with the remaining unparsed tokens
  */
-let alternation = parsers => tokens => {
+let choice = parsers => tokens => {
     for (let parser of parsers) {
         let [parse_result, remaining_tokens] = parser()(tokens)
         if (parse_result) return [parse_result, remaining_tokens]
@@ -44,5 +44,5 @@ let alternation = parsers => tokens => {
     return [null, tokens]
 }
 
-module.exports = { EMPTY, terminal, alternation, sequencing }
+module.exports = { EMPTY, terminal, choice, sequence }
 
